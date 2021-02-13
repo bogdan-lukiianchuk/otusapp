@@ -1,0 +1,81 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-initdb-job
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ .Release.Name }}-initdb-job
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: check-db-ready
+          image: {{ .Values.postgresImage }}
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: db_host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: db_port
+          command:
+            - sh
+            - "-c"
+            - |
+              until pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT;
+              do echo waiting for database; sleep 2; done;
+      containers:
+        - name: initdb
+          image: {{ .Values.postgresImage }}
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: db_host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: db_name
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secret
+                  key: db_password
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secret
+                  key: db_username
+          command:
+            - sh
+            - "-c"
+            - |
+              psql postgresql://$USERNAME:$PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$DB_NAME <<'EOF'
+                create table app_user (id bigint primary key, name text, address text, phone_number text);
+                create sequence user_id_sequence owned by app_user.id;
+                alter table app_user alter column id set default nextval('user_id_sequence');
+                insert into app_user (name, address, phone_number) values ('Jon Snow', 'wall', '987654321');
+              EOF
+      volumes:
+      - name: {{ .Release.Name }}-secret
+        secret:
+          secretName: {{ .Release.Name }}-secret
+      - name: {{ .Release.Name }}-configmap
+        configMap:
+          name: {{ .Release.Name }}-configmap
+  backoffLimit: 2
