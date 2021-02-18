@@ -102,6 +102,6 @@ spec:
        - name: {{ .Release.Name }}-configmap
          configMap:
             name: {{ .Release.Name }}-configmap
-       - name: user-service-secret
+       - name: {{ .Release.Name }}-secret
          secret:
            secretName: {{ .Release.Name }}-secret
