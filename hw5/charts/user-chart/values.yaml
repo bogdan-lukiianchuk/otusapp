@@ -1,0 +1,70 @@
+replicaCount: 2
+
+image:
+  repository: bogdanluk/user-service
+  pullPolicy: IfNotPresent
+  tag: v12
+probe:
+  path: /actuator/health
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: NodePort
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /
+  tls: []
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+
+dbValues:
+  port: 5432
+  host: postgres.postgres
+  name: user_service
+
+postgresImage: postgres:latest
+postgresqlUsername: srv.user
+postgresqlPassword: srvpass
+jwtSecret: XLqmshiYH9lzhWROHGzGscTDZmBigwqiqB135aiT9R+sTTCXDu+axuaZBKMHgwEATlXcRq0nhRlfvQambcDQ4g==
+
+authService:
+  path: http://user-service-auth.auth:8080/api/updateUser
+  accessToken: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwibG9naW4iOiJ1c2VyU2VydmljZSIsImF1dGgiOiJST0xFX1NSViIsImV4cCI6MTY0ODQ5OTkzNSwiaWF0IjoxNjE2OTYzOTM1fQ._GW_9Tzbage8nuprlFGFBbuebbrEEi2ve3A2b0EAyStcIQcupgjTtbLsB7wSaEv0lchA-18mxgZMhJ8BmnLR5A"
+
+metrics:
+  serviceMonitor:
+    enabled: true
