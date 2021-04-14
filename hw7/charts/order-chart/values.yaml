@@ -1,0 +1,58 @@
+replicaCount: 2
+
+image:
+  repository: bogdanluk/order-service
+  pullPolicy: IfNotPresent
+  tag: v3.5
+probe:
+  path: /actuator/health
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  port: 8080
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+kafka:
+  bootstrapServers: "kafka.infrastructure.svc.cluster.local:9092"
+
+dbValues:
+  port: 5432
+  host: postgres-order.postgres
+  name: order_db
+billingService:
+  path: http://billing-service:8080/api/accounts/
+postgresImage: postgres:latest
+postgresqlUsername: srv.user
+postgresqlPassword: srvpass
+jwtSecret: XLqmshiYH9lzhWROHGzGscTDZmBigwqiqB135aiT9R+sTTCXDu+axuaZBKMHgwEATlXcRq0nhRlfvQambcDQ4g==
+
+metrics:
+  serviceMonitor:
+    enabled: true

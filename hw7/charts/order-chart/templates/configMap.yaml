@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  db_port: {{ .Values.dbValues.port | quote }}
+  db_host: {{ .Values.dbValues.host }}
+  db_name: {{ .Values.dbValues.name }}
+  billing_service_path: {{ .Values.billingService.path | quote }}
+  bootstrap_servers: {{ .Values.kafka.bootstrapServers | quote }}
+  application.properties: {{ range .Files.Lines "application.properties" }}
+    {{ . }}{{ "\n" }}{{ end }}

@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: refresh-token
+spec:
+  template:
+    metadata:
+      name: refresh-token
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: refresh-token
+          image: postgres:latest
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-auth-configmap
+                  key: db_host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-auth-configmap
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-auth-configmap
+                  key: db_name
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-auth-secret
+                  key: db_password
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-auth-secret
+                  key: db_username
+          command:
+            - sh
+            - "-c"
+            - |
+              psql postgresql://$USERNAME:$PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$DB_NAME <<'EOF'
+                create table refresh_token (refresh_token_id uuid primary key, app_user_id bigint not null unique references app_user(id), expiration_time timestamp);
+              EOF
+      volumes:
+      - name: user-service-auth-secret
+        secret:
+          secretName: user-service-auth-secret
+      - name: user-service-auth-configmap
+        configMap:
+          name: user-service-auth-configmap
+  backoffLimit: 2

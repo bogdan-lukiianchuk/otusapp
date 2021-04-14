@@ -1,0 +1,997 @@
+{
+	"info": {
+		"_postman_id": "259de8d6-24a3-4254-b77d-9d22d9783aea",
+		"name": "hw7-billing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "register user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var login = pm.variables.replaceIn('{{$randomFirstName}}');",
+							"pm.collectionVariables.set(\"login\", login);",
+							"pm.collectionVariables.set(\"password\", login);",
+							"pm.collectionVariables.set(\"token\", null);",
+							"const jar = pm.cookies.jar();",
+							"jar.clear(pm.request.url, function (error) {",
+							"  // error - <Error>",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"{{password}}\",\n    \"login\": \"{{login}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/register",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"token\", pm.cookies.get('Authorization'));",
+							"pm.test(\"status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"has Authorization cookie\", function() {",
+							"    pm.cookies.has(\"Authorization\");",
+							"});",
+							"pm.test(\"has refresh cookie\", function() {",
+							"    pm.cookies.has(\"refresh\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"{{password}}\",\n    \"login\": \"{{login}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "refresh",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"token\", pm.cookies.get('Authorization'));",
+							"",
+							"pm.test(\"Cookie Authorization is present\", () => {",
+							"  pm.expect(pm.cookies.has('Authorization')).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Cookie refresh is present\", () => {",
+							"  pm.expect(pm.cookies.has('refresh')).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/refresh",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkAccount",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"accountId\", responseJSON[\"accountId\"]);",
+							"",
+							"pm.test(\"Response returned account id\", function () {",
+							"  pm.expect(responseJSON.accountId).to.be.a(\"number\");",
+							"});",
+							"",
+							"pm.test(\"Response returned money equal 0\", function () {",
+							"  pm.expect(responseJSON.money).to.equal(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/find",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"find"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add money to account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var operationUuid = pm.variables.replaceIn('{{$randomUUID}}');",
+							"pm.collectionVariables.set(\"operationUuid\", operationUuid);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned status success\", function () {",
+							"  pm.expect(responseJSON.status).to.equal(\"SUCCESS\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"operationCode\" : \"TOP_UP\",\n    \"operationUuid\" : \"{{operationUuid}}\",\n    \"accountId\" : \"{{accountId}}\",\n    \"money\" : 600\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/operations",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"operations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkMoney 600",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned money equal 600\", function () {",
+							"  pm.expect(responseJSON.money).to.equal(600);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/find",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"find"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"orderId\", responseJSON[\"orderId\"]);",
+							"",
+							"pm.test(\"Response returned order id\", function () {",
+							"  pm.expect(responseJSON.orderId).to.be.a(\"number\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addItems",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"name\": \"молоко\",\n   \"count\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}/products",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request has two items\", function () {",
+							"  pm.expect(jsonData.items.length).to.equal(1);",
+							"});",
+							"",
+							"pm.test(\"Test data type of the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.id).to.be.a(\"number\");",
+							"  pm.expect(jsonData.createTime).to.be.a(\"string\");",
+							"  pm.expect(jsonData.lastUpdateTime).to.be.a(\"string\");",
+							"  pm.expect(jsonData.status).to.be.a(\"string\");",
+							"  pm.expect(jsonData.items).to.be.an(\"array\");",
+							"  pm.expect(jsonData.totalCost).to.be.a(\"number\");",
+							"});",
+							"",
+							"pm.test(\"Response returned totalCost 580\", function () {",
+							"  pm.expect(jsonData.totalCost).to.equal(580);",
+							"});",
+							"",
+							"pm.test(\"status is created\", () => {",
+							"  const expectedObject = {",
+							"    \"status\": \"CREATED\"",
+							"  };",
+							"  pm.expect(pm.response.json()).to.deep.include(expectedObject);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"name\": \"молоко\",\n   \"count\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "payOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"WAITING_PAY\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkNotification success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned valid order Number\", function () {",
+							"  pm.expect(responseJSON[0].orderNumber).to.equal(pm.variables.get(\"orderId\"));",
+							"});",
+							"",
+							"pm.test(\"Response returned type is ORDER_CREATED\", function () {",
+							"  pm.expect(responseJSON[0].type).to.equal(\"ORDER_CREATED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/email/notification",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"email",
+						"notification"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkMoney 20",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned money equal 20\", function () {",
+							"  pm.expect(responseJSON.money).to.equal(20);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/find",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"find"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createOrder№2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"orderId\", responseJSON[\"orderId\"]);",
+							"",
+							"pm.test(\"Response returned order id\", function () {",
+							"  pm.expect(responseJSON.orderId).to.be.a(\"number\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addItems№2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"name\": \"молоко\",\n   \"count\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}/products",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkOrder№2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request has two items\", function () {",
+							"  pm.expect(jsonData.items.length).to.equal(1);",
+							"});",
+							"",
+							"pm.test(\"Test data type of the response\", () => {",
+							"  pm.expect(jsonData).to.be.an(\"object\");",
+							"  pm.expect(jsonData.id).to.be.a(\"number\");",
+							"  pm.expect(jsonData.createTime).to.be.a(\"string\");",
+							"  pm.expect(jsonData.lastUpdateTime).to.be.a(\"string\");",
+							"  pm.expect(jsonData.status).to.be.a(\"string\");",
+							"  pm.expect(jsonData.items).to.be.an(\"array\");",
+							"  pm.expect(jsonData.totalCost).to.be.a(\"number\");",
+							"});",
+							"",
+							"pm.test(\"Response returned totalCost 580\", function () {",
+							"  pm.expect(jsonData.totalCost).to.equal(580);",
+							"});",
+							"",
+							"pm.test(\"status is created\", () => {",
+							"  const expectedObject = {",
+							"    \"status\": \"CREATED\"",
+							"  };",
+							"  pm.expect(pm.response.json()).to.deep.include(expectedObject);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"name\": \"молоко\",\n   \"count\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "approveOrder№2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"WAITING_PAY\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkNotification№2 fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned valid order Number\", function () {",
+							"  pm.expect(responseJSON[0].orderNumber).to.equal(pm.variables.get(\"orderId\"));",
+							"});",
+							"",
+							"pm.test(\"Response returned type is INSUFFICIENT_FUNDS\", function () {",
+							"  pm.expect(responseJSON[0].type).to.equal(\"INSUFFICIENT_FUNDS\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/email/notification",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"email",
+						"notification"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkMoney№2 20",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned money equal 20\", function () {",
+							"  pm.expect(responseJSON.money).to.equal(20);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/find",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"find"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+					"tests[\"[INFO] Response: \" + responseBody] = true;"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "login",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "orderId",
+			"value": ""
+		},
+		{
+			"key": "accountId",
+			"value": ""
+		},
+		{
+			"key": "operationUuid",
+			"value": ""
+		}
+	]
+}
