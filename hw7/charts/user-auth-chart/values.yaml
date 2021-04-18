@@ -1,0 +1,54 @@
+replicaCount: 2
+
+image:
+  repository: bogdanluk/user-service-auth
+  pullPolicy: IfNotPresent
+  tag: v6.2
+probe:
+  path: /actuator/health
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  port: 8080
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+billingService:
+  path: http://billing-service.applications:8080/api/accounts/
+  accessToken: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwibG9naW4iOiJ1c2VyU2VydmljZSIsImF1dGgiOiJST0xFX1NSViIsImV4cCI6MTY0ODQ5OTkzNSwiaWF0IjoxNjE2OTYzOTM1fQ._GW_9Tzbage8nuprlFGFBbuebbrEEi2ve3A2b0EAyStcIQcupgjTtbLsB7wSaEv0lchA-18mxgZMhJ8BmnLR5A"
+
+dbValues:
+  port: 5432
+  host: postgres-auth.postgres
+  name: postgres
+
+postgresImage: postgres:latest
+postgresqlUsername: srv.user
+postgresqlPassword: srvpass
+jwtSecret: XLqmshiYH9lzhWROHGzGscTDZmBigwqiqB135aiT9R+sTTCXDu+axuaZBKMHgwEATlXcRq0nhRlfvQambcDQ4g==

@@ -1,0 +1,22 @@
+fullnameOverride: postgres-order
+postgresqlDatabase: order_db
+postgresqlUsername: srv.user
+postgresqlPassword: srvpass
+
+service:
+  type: NodePort
+  port: 5432
+
+persistence:
+  enabled: true
+  size: 500m
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 250m
+
+metrics:
+  enabled: false
+  serviceMonitor:
+    enabled: false
