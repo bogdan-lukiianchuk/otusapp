@@ -1,0 +1,1 @@
+insert into operation_code values (3, 'CANCEL');

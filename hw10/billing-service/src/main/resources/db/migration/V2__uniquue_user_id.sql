@@ -1,0 +1,1 @@
+alter table account add constraint user_id_unique unique (user_id);

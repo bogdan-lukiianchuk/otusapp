@@ -1,0 +1,65 @@
+replicaCount: 2
+
+image:
+  repository: bogdanluk/order-service
+  pullPolicy: IfNotPresent
+  tag: v3.6
+probe:
+  path: /actuator/health
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  port: 8080
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+kafka:
+  bootstrapServers: "kafka.infrastructure.svc.cluster.local:9092"
+
+dbValues:
+  port: 5432
+  host: postgres-order.postgres
+  name: order_db
+billingService:
+  path: http://billing-service:8080/api/accounts/
+deliveryService:
+  path: http://delivery-service:8080/api/delivery/
+productService:
+  path: http://product-service:8080/api/products/
+warehouseService:
+  path: http://warehouse-service:8080/api/warehouse/
+
+postgresImage: postgres:latest
+postgresqlUsername: srv.user
+postgresqlPassword: srvpass
+jwtSecret: XLqmshiYH9lzhWROHGzGscTDZmBigwqiqB135aiT9R+sTTCXDu+axuaZBKMHgwEATlXcRq0nhRlfvQambcDQ4g==
+jwtSecretSrv: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwibG9naW4iOiJ1c2VyU2VydmljZSIsImF1dGgiOiJST0xFX09SREVSX1NSViIsImV4cCI6MTYzNTgzNDI3NCwiaWF0IjoxNjIyODc0Mjc0fQ.hbh84c1d2jqX-F-kpZ7MAeRkHKPF9CT-vxt9XUBxvXLdzZp2sOPbms6d0izkrQ5-JDNNo3bz9b02wGd0qrXgew
+metrics:
+  serviceMonitor:
+    enabled: true

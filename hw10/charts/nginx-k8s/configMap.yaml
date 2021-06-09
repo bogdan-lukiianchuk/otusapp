@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  nginx.conf: |
+    server {
+      listen       80;
+      server_name  localhost;
+
+      location /users/ {
+        proxy_pass http://user-service.applications:8080/api/;
+      }
+
+      location /orders/ {
+        proxy_pass http://order-service.applications:8080/api/orders/;
+      }
+
+      location /products/ {
+        proxy_pass http://product-service.applications:8080/api/products/;
+      }
+
+      location /admin/orders/ {
+        proxy_pass http://order-service.applications:8080/api/admin/orders/;
+      }
+
+      location /auth/ {
+        proxy_pass http://user-service-auth.auth:8080/api/;
+      }
+
+      location /email/ {
+        proxy_pass http://notification-service.applications:8080/api/email/;
+      }
+
+      location /accounts/ {
+        proxy_pass http://billing-service.applications:8080/api/accounts/;
+      }
+
+      location /warehouse/ {
+        proxy_pass http://warehouse-service.applications:8080/api/warehouse/;
+      }
+
+      location /delivery/ {
+        proxy_pass http://delivery-service.applications:8080/api/delivery/;
+      }
+
+      location /swagger/ {
+        proxy_pass http://order-service.applications:8080/;
+      }
+    }

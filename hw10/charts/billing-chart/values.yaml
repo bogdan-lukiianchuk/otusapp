@@ -1,0 +1,49 @@
+replicaCount: 2
+
+image:
+  repository: bogdanluk/billing-service
+  pullPolicy: IfNotPresent
+  tag: v1.2
+probe:
+  path: /actuator/health
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  port: 8080
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+dbValues:
+  port: 5433
+  host: postgres-billing.postgres
+  name: billing_db
+
+postgresImage: postgres:latest
+postgresqlUsername: srv.user
+postgresqlPassword: srvpass
+jwtSecret: XLqmshiYH9lzhWROHGzGscTDZmBigwqiqB135aiT9R+sTTCXDu+axuaZBKMHgwEATlXcRq0nhRlfvQambcDQ4g==

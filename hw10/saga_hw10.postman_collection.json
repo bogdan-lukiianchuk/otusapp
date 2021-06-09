@@ -1,0 +1,1570 @@
+{
+	"info": {
+		"_postman_id": "6a07ddeb-250e-4656-b4b3-a47dc360b5e7",
+		"name": "saga_hw10",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"adminToken\", pm.cookies.get('Authorization'));",
+							"pm.test(\"status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"has Authorization cookie\", function() {",
+							"    pm.cookies.has(\"Authorization\");",
+							"});",
+							"pm.test(\"has refresh cookie\", function() {",
+							"    pm.cookies.has(\"refresh\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"admin\",\n    \"login\": \"admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "replenish the warehouse",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"replenishmentCode\":\"code_1\",\n    \"supplies\":[\n          {\n            \"productId\": 1196,\n            \"count\": 5\n        },\n        {\n            \"productId\": 37,\n            \"count\": 1\n        },\n        {\n            \"productId\": 3,\n            \"count\": 3\n        },\n        {\n            \"productId\": 1316,\n            \"count\": 10\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/replenishment",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"replenishment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "save product count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"appleCount\", responseJSON);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/products/3",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"products",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "save next product count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"bananaCount\", responseJSON);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/products/1316",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"products",
+						"1316"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var login = pm.variables.replaceIn('{{$randomFirstName}}');",
+							"pm.collectionVariables.set(\"login\", login);",
+							"pm.collectionVariables.set(\"password\", login);",
+							"pm.collectionVariables.set(\"token\", null);",
+							"const jar = pm.cookies.jar();",
+							"jar.clear(pm.request.url, function (error) {",
+							"  // error - <Error>",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"{{password}}\",\n    \"login\": \"{{login}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/register",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"token\", pm.cookies.get('Authorization'));",
+							"pm.test(\"status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"has Authorization cookie\", function() {",
+							"    pm.cookies.has(\"Authorization\");",
+							"});",
+							"pm.test(\"has refresh cookie\", function() {",
+							"    pm.cookies.has(\"refresh\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"{{password}}\",\n    \"login\": \"{{login}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add money to account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var operationUuid = pm.variables.replaceIn('{{$randomUUID}}');",
+							"pm.collectionVariables.set(\"operationUuid\", operationUuid);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned status success\", function () {",
+							"  pm.expect(responseJSON.status).to.equal(\"SUCCESS\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"operationCode\" : \"TOP_UP\",\n    \"operationUuid\" : \"{{operationUuid}}\",\n    \"accountId\" : \"{{accountId}}\",\n    \"money\" : 600\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/operations",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"operations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check money 600",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned money equal 600\", function () {",
+							"  pm.expect(responseJSON.money).to.equal(600);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/find",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"find"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create order",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var requestId = pm.variables.replaceIn('{{$randomUUID}}');",
+							"pm.collectionVariables.set(\"requestId\", requestId);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody);",
+							"pm.test(\"Response returned order id\", function () {",
+							"  pm.expect(responseJSON.orderId).to.be.a(\"number\");",
+							"});",
+							"",
+							"pm.collectionVariables.set(\"orderId\", responseJSON.orderId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "requestId",
+						"type": "text",
+						"value": "{{requestId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addItems",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"name\": \"ART FRUIT Яблоко 1шт\",\n   \"count\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}/products",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add delivery time",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"deliveryTime\":\"{{firstDeliveryTime}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request has one items\", function () {",
+							"  pm.expect(jsonData.items.length).to.equal(1);",
+							"});",
+							"",
+							"pm.test(\"Response returned totalCost 234\", function () {",
+							"  pm.expect(jsonData.totalCost).to.equal(234);",
+							"});",
+							"",
+							"pm.test(\"Check delivery time\", function () {",
+							"  pm.expect(jsonData.deliveryTime).to.equal(pm.collectionVariables.get(\"firstDeliveryTime\"));",
+							"});",
+							"",
+							"pm.test(\"Check product count\", function () {",
+							"  pm.expect(jsonData.items[0].count).to.equal(3);",
+							"});",
+							"",
+							"pm.test(\"Check product id\", function () {",
+							"  pm.expect(jsonData.items[0].productId).to.equal(3);",
+							"});",
+							"",
+							"pm.test(\"Status is created\", () => {",
+							"  const expectedObject = {",
+							"    \"status\": \"CREATED\"",
+							"  };",
+							"  pm.expect(pm.response.json()).to.deep.include(expectedObject);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pay order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"WAITING_PAY\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/status/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"status",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check money 366",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned money equal 366\", function () {",
+							"  pm.expect(responseJSON.money).to.equal(366);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/find",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"find"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reservation is done",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned reservation with productId 3\", function () {",
+							"  pm.expect(responseJSON.reservations[0].productId).to.equal(3);",
+							"});",
+							"pm.test(\"Response returned reservation with product count 3\", function () {",
+							"  pm.expect(responseJSON.reservations[0].count).to.equal(3);",
+							"});",
+							"pm.test(\"Response returned reservation DONE\", function () {",
+							"  pm.expect(responseJSON.status).to.equal(\"DONE\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"replenishmentCode\":\"code_1\",\n    \"supplies\":[\n          {\n            \"productId\": 1196,\n            \"count\": 5\n        },\n        {\n            \"productId\": 37,\n            \"count\": 1\n        },\n        {\n            \"productId\": 3,\n            \"count\": 3\n        },\n        {\n            \"productId\": 1316,\n            \"count\": 10\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/reservation/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"reservation",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check order done",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request has one items\", function () {",
+							"  pm.expect(jsonData.items.length).to.equal(1);",
+							"});",
+							"",
+							"pm.test(\"Response returned totalCost 234\", function () {",
+							"  pm.expect(jsonData.totalCost).to.equal(234);",
+							"});",
+							"",
+							"pm.test(\"Check delivery time\", function () {",
+							"  pm.expect(jsonData.deliveryTime).to.equal(pm.collectionVariables.get(\"firstDeliveryTime\"));",
+							"});",
+							"",
+							"pm.test(\"Check product count\", function () {",
+							"  pm.expect(jsonData.items[0].count).to.equal(3);",
+							"});",
+							"",
+							"pm.test(\"Check product count\", function () {",
+							"  pm.expect(jsonData.items[0].productId).to.equal(3);",
+							"});",
+							"",
+							"pm.test(\"Status is done\", () => {",
+							"  const expectedObject = {",
+							"    \"status\": \"DONE\"",
+							"  };",
+							"  pm.expect(pm.response.json()).to.deep.include(expectedObject);",
+							"});",
+							"",
+							"pm.collectionVariables.set(\"firstCourierName\", jsonData.courierName);",
+							"",
+							"var apples = pm.collectionVariables.get(\"appleCount\");",
+							"var resultAppleCount = apples - jsonData.items[0].count;",
+							"pm.collectionVariables.set(\"appleCount\", resultAppleCount);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check number of products has decreased",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody);",
+							"pm.test(\"Response is eql saved count\", function () {",
+							"  pm.expect(responseJSON).eql(pm.collectionVariables.get(\"appleCount\"));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/products/3",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"products",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cancel delivery after test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"deliveryTime\": \"{{firstDeliveryTime}}\",\n    \"courierName\":\"{{firstCourierName}}\",\n    \"orderId\": {{orderId}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/delivery/cancel",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"delivery",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check next product count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody);",
+							"pm.test(\"Response is eql saved count\", function () {",
+							"  pm.expect(responseJSON).eql(pm.collectionVariables.get(\"bananaCount\"));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/products/1316",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"products",
+						"1316"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create order 2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var requestId = pm.variables.replaceIn('{{$randomUUID}}');",
+							"pm.collectionVariables.set(\"requestId\", requestId);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody);",
+							"pm.test(\"Response returned order id\", function () {",
+							"  pm.expect(responseJSON.orderId).to.be.a(\"number\");",
+							"});",
+							"",
+							"pm.collectionVariables.set(\"orderId\", responseJSON.orderId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "requestId",
+						"type": "text",
+						"value": "{{requestId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add Items to order 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"name\": \"Бананы фас.1кг\",\n   \"count\": 4\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}/products",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add wrong delivery time to order 2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"deliveryTime\":\"2021-06-10T22:00:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check order 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request has one items\", function () {",
+							"  pm.expect(jsonData.items.length).to.equal(1);",
+							"});",
+							"",
+							"pm.test(\"Response returned totalCost 320\", function () {",
+							"  pm.expect(jsonData.totalCost).to.equal(320);",
+							"});",
+							"",
+							"pm.test(\"Check delivery time\", function () {",
+							"  pm.expect(jsonData.deliveryTime).to.equal(\"2021-06-10T22:00:00\");",
+							"});",
+							"",
+							"pm.test(\"Check product count\", function () {",
+							"  pm.expect(jsonData.items[0].count).to.equal(4);",
+							"});",
+							"",
+							"pm.test(\"Check product id\", function () {",
+							"  pm.expect(jsonData.items[0].productId).to.equal(1316);",
+							"});",
+							"",
+							"pm.test(\"Status is created\", () => {",
+							"  const expectedObject = {",
+							"    \"status\": \"CREATED\"",
+							"  };",
+							"  pm.expect(pm.response.json()).to.deep.include(expectedObject);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pay order 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"WAITING_PAY\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/status/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"status",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check order 2 error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request has one items\", function () {",
+							"  pm.expect(jsonData.items.length).to.equal(1);",
+							"});",
+							"",
+							"pm.test(\"Response returned totalCost 320\", function () {",
+							"  pm.expect(jsonData.totalCost).to.equal(320);",
+							"});",
+							"",
+							"pm.test(\"Check delivery time\", function () {",
+							"  pm.expect(jsonData.deliveryTime).to.equal(\"2021-06-10T22:00:00\");",
+							"});",
+							"",
+							"pm.test(\"Check product count\", function () {",
+							"  pm.expect(jsonData.items[0].count).to.equal(4);",
+							"});",
+							"",
+							"pm.test(\"Check product id\", function () {",
+							"  pm.expect(jsonData.items[0].productId).to.equal(1316);",
+							"});",
+							"",
+							"pm.test(\"Status is error\", () => {",
+							"  const expectedObject = {",
+							"    \"status\": \"ERROR\"",
+							"  };",
+							"  pm.expect(pm.response.json()).to.deep.include(expectedObject);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/orders/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reservation 2 is canceled",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned empty list of reservation\", function () {",
+							"  pm.expect(responseJSON.reservations.length).to.equal(0);",
+							"});",
+							"pm.test(\"Response returned reservation CANCELED\", function () {",
+							"  pm.expect(responseJSON.status).to.equal(\"CANCELED\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 3000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"replenishmentCode\":\"code_1\",\n    \"supplies\":[\n          {\n            \"productId\": 1196,\n            \"count\": 5\n        },\n        {\n            \"productId\": 37,\n            \"count\": 1\n        },\n        {\n            \"productId\": 3,\n            \"count\": 3\n        },\n        {\n            \"productId\": 1316,\n            \"count\": 10\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/reservation/{{orderId}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"reservation",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check next product count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody);",
+							"",
+							"pm.test(\"Response is eql saved bananaCount\", function () {",
+							"  pm.expect(responseJSON).eql(pm.collectionVariables.get(\"bananaCount\"));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 3000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/warehouse/products/1316",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"warehouse",
+						"products",
+						"1316"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check money not changed",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 3000);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Request is successful with a status code of 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.test(\"Response returned money equal 366\", function () {",
+							"  pm.expect(responseJSON.money).to.equal(366);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/accounts/find",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"accounts",
+						"find"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"tests[\"[INFO] Request: \" + JSON.stringify(request)] = true;",
+					"tests[\"[INFO] Response: \" + responseBody] = true;",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework"
+		},
+		{
+			"key": "login",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "requestId",
+			"value": ""
+		},
+		{
+			"key": "orderId",
+			"value": ""
+		},
+		{
+			"key": "adminToken",
+			"value": ""
+		},
+		{
+			"key": "operationUuid",
+			"value": ""
+		},
+		{
+			"key": "firstDeliveryTime",
+			"value": "2021-06-10T14:00:00"
+		},
+		{
+			"key": "firstCourierName",
+			"value": ""
+		},
+		{
+			"key": "appleCount",
+			"value": ""
+		},
+		{
+			"key": "bananaCount",
+			"value": ""
+		}
+	]
+}

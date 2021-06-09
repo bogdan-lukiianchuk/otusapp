@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  application.properties: {{ range .Files.Lines "application.properties" }}
+    {{ . }}{{ "\n" }}{{ end }}
